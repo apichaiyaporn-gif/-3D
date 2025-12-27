@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NK-TDS Premium Gold & Purple Logo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* พื้นหลังสีม่วงเข้มจัดเพื่อให้สีทองและชมพูเด่นชัด */
+            background-color: #0d0216; 
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* เพิ่ม Vignette สีม่วงเข้มขอบจอ */
+            background: radial-gradient(circle at center, rgba(26, 11, 46, 0) 0%, rgba(13, 2, 22, 1) 90%);
+        }
+
+        #three-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: floatLogo 6s ease-in-out infinite;
+        }
+
+        /* ปรับแสงพื้นหลังให้เป็นโทน ม่วง-ชมพู-ทอง */
+        .origin-light {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, 
+                rgba(255, 191, 0, 0.4) 0%, 
+                rgba(255, 0, 127, 0.2) 40%, 
+                rgba(26, 11, 46, 0.3) 70%, 
+                transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0.8;
+            animation: pulseSource 4s infinite ease-in-out;
+            mix-blend-mode: screen;
+        }
+
+        .logo-overlay {
+            max-width: 350px; 
+            width: 90vw;
+            height: auto;
+            position: relative;
+            /* เพิ่มความแรงของแสงสีทอง (Intense Golden Glow) และชมพู */
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.8))
+                    drop-shadow(-15px 0 30px rgba(255, 191, 0, 0.7)) /* Golden Glow Left */
+                    drop-shadow(15px 0 30px rgba(255, 0, 127, 0.5))  /* Pink Glow Right */
+                    drop-shadow(0 0 50px rgba(255, 215, 0, 0.3));   /* Amber Bloom */
+            animation: harmonyLight 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes harmonyLight {
+            0% { 
+                filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.8)) 
+                        drop-shadow(-20px 0 40px rgba(255, 191, 0, 0.8)) 
+                        drop-shadow(10px 0 20px rgba(255, 0, 127, 0.4)); 
+            }
+            100% { 
+                filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.8)) 
+                        drop-shadow(-10px 0 20px rgba(255, 191, 0, 0.4)) 
+                        drop-shadow(20px 0 40px rgba(255, 0, 127, 0.7)); 
+            }
+        }
+
+        @keyframes pulseSource {
+            0%, 100% { transform: scale(0.8); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <div class="logo-wrapper">
+            <div class="origin-light"></div>
+            <!-- ใช้รูปภาพโลโก้เดิมแต่ปรับ Filter สีผ่าน CSS -->
+            <img src="https://i.postimg.cc/cCZS5csS/Untitled_design_(1).png" alt="Logo" class="logo-overlay">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        const CONFIG = {
+            particleCount: 3000, 
+            sparkleCount: 200, // เพิ่มอนุภาคประกายวิบวับ
+            brainSize: 2.2, 
+            colors: {
+                gold: new THREE.Color(0xffbf00),   // สีส้มทองเข้ม
+                pink: new THREE.Color(0xff007f),   // สีชมพูบานเย็น
+                purple: new THREE.Color(0x4a0080)  // สีม่วงสำหรับผสม
+            }
+        };
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 5.5; 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.domElement.id = 'three-canvas';
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        function createGlowTexture() {
+            const size = 128;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const center = size / 2;
+            const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
+            gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            return new THREE.CanvasTexture(canvas);
+        }
+        const glowTexture = createGlowTexture();
+
+        // --- Main Brain Geometry ---
+        const geometry = new THREE.BufferGeometry();
+        const positions = []; const colors = []; const sizes = []; const sides = []; const randoms = [];
+
+        for (let i = 0; i < CONFIG.particleCount; i++) {
+            const isRight = Math.random() > 0.5;
+            const sideMultiplier = isRight ? 1 : -1;
+            const u = Math.random(); const v = Math.random();
+            const theta = 2 * Math.PI * u;
+            const phi = Math.acos(2 * v - 1);
+            let r = Math.cbrt(Math.random()) * CONFIG.brainSize;
+            let x = r * Math.sin(phi) * Math.cos(theta) * 0.85 + (0.3 * sideMultiplier);
+            let y = r * Math.sin(phi) * Math.sin(theta) * 0.95;
+            let z = r * Math.cos(phi) * 1.1;
+            
+            positions.push(x, y, z);
+            const c = isRight ? CONFIG.colors.pink : CONFIG.colors.gold;
+            colors.push(c.r, c.g, c.b);
+            sizes.push(Math.random() * 1.5 + 0.5);
+            sides.push(isRight ? 1.0 : 0.0);
+            randoms.push(Math.random());
+        }
+
+        // --- Sparkle Geometry (วิบวับ) ---
+        for (let i = 0; i < CONFIG.sparkleCount; i++) {
+            let r = (CONFIG.brainSize + 0.5) * (0.8 + Math.random() * 0.5);
+            const u = Math.random(); const v = Math.random();
+            const theta = 2 * Math.PI * u;
+            const phi = Math.acos(2 * v - 1);
+            positions.push(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
+            colors.push(1.0, 0.9, 0.5); // Gold white sparkle
+            sizes.push(Math.random() * 3.0 + 1.0);
+            sides.push(2.0); // Marker for sparkles
+            randoms.push(Math.random());
+        }
+
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+        geometry.setAttribute('aSide', new THREE.Float32BufferAttribute(sides, 1));
+        geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 1));
+
+        const material = new THREE.ShaderMaterial({
+            uniforms: { uTime: { value: 0 }, uTexture: { value: glowTexture }, uColorLeft: { value: CONFIG.colors.gold }, uColorRight: { value: CONFIG.colors.pink } },
+            vertexShader: `
+                attribute float size; attribute float aSide; attribute float aRandom;
+                varying vec3 vColor; varying float vAlpha;
+                uniform float uTime; uniform vec3 uColorLeft; uniform vec3 uColorRight;
+                void main() {
+                    vec3 pos = position;
+                    float angle = uTime * 0.12;
+                    pos.xz = pos.xz * mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+                    
+                    float sparkle = 1.0;
+                    if(aSide > 1.5) { // Sparkle logic
+                        sparkle = (sin(uTime * 4.0 + aRandom * 10.0) * 0.5 + 0.5);
+                        pos.y += sin(uTime + aRandom * 5.0) * 0.1;
+                    }
+                    
+                    float wave = smoothstep(0.85, 1.0, sin(uTime * 3.0 + pos.z * 0.6 + aRandom));
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    
+                    gl_PointSize = size * (1.0 + wave * 2.0 + (aSide > 1.5 ? sparkle * 2.0 : 0.0)) * (40.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                    
+                    if(aSide > 1.5) {
+                        vColor = vec3(1.0, 0.9, 0.6); // Sparkle color
+                        vAlpha = sparkle * 0.8;
+                    } else {
+                        vColor = mix(mix(uColorLeft, uColorRight, aSide), vec3(1.0, 1.0, 1.0), wave * 0.9);
+                        vAlpha = 0.4 + (wave * 0.6);
+                    }
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D uTexture; varying vec3 vColor; varying float vAlpha;
+                void main() {
+                    vec4 texColor = texture2D(uTexture, gl_PointCoord);
+                    if (texColor.a < 0.05) discard;
+                    gl_FragColor = vec4(vColor, vAlpha * texColor.a);
+                }
+            `,
+            transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+        });
+
+        const brain = new THREE.Points(geometry, material);
+        scene.add(brain);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = performance.now() * 0.001;
+            material.uniforms.uTime.value = time;
+            brain.position.y = Math.sin(time * 0.6) * 0.05;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
