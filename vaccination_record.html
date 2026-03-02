@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYSTEM: VACCINATION_RECORD // CLASSIFIED</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-dark: #0f1113;
+      --panel-bg: #1a1c20;
+      --panel-border: #3a3f44;
+      --accent-amber: #ffae00;
+      --accent-dim: #8a6d1c;
+      --text-main: #b8c5d6;
+      --text-bright: #ffffff;
+      --input-bg: #000000;
+      --hazard-yellow: #d4a017;
+      --hazard-black: #111;
+      --terminal-green: #00ff41;
+      --cyan-tech: #00e5ff;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Share Tech Mono', monospace;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 50% 50%, #1a1c20 0%, #050505 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, #000 3px);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mech-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      border: 4px solid #444;
+      background: var(--panel-bg);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(0, 0, 0, 0.9);
+      position: relative;
+      padding: 20px;
+      border-top: 10px solid var(--panel-border);
+      border-bottom: 10px solid var(--panel-border);
+    }
+
+    .bolt {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: radial-gradient(circle, #555 20%, #222 100%);
+      border-radius: 50%;
+      border: 1px solid #000;
+      box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+      z-index: 10;
+    }
+
+    .bolt.tl { top: 10px; left: 10px; }
+    .bolt.tr { top: 10px; right: 10px; }
+    .bolt.bl { bottom: 10px; left: 10px; }
+    .bolt.br { bottom: 10px; right: 10px; }
+
+    .search-module {
+      display: flex;
+      gap: 10px;
+      background: #080808;
+      border: 1px solid var(--cyan-tech);
+      padding: 15px;
+      margin-bottom: 25px;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+      position: relative;
+      flex-wrap: wrap;
+    }
+
+    .search-module::before {
+      content: 'SEARCH PROTOCOL // ACCESSING MASTER FILE...';
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: var(--panel-bg);
+      padding: 0 10px;
+      font-size: 10px;
+      color: var(--cyan-tech);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .search-input-wrapper { flex-grow: 1; position: relative; min-width: 250px; }
+    .search-input {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      color: var(--cyan-tech);
+      padding: 10px 15px 10px 35px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #555; }
+
+    .search-btn {
+      background: var(--cyan-tech);
+      color: #000;
+      border: none;
+      padding: 0 25px;
+      height: 40px;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+    }
+
+    .db-status {
+      display: flex;
+      flex-direction: column;
+      font-size: 9px;
+      color: #555;
+      margin-left: 10px;
+      border-left: 1px solid #333;
+      padding-left: 10px;
+    }
+
+    .db-status span.active { color: var(--terminal-green); text-shadow: 0 0 5px var(--terminal-green); }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-dim);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .system-title { text-transform: uppercase; color: var(--accent-amber); }
+    .system-title h2 { margin: 0; font-size: 24px; border-left: 5px solid var(--accent-amber); padding-left: 15px; }
+    .system-title h3 { margin: 0; font-size: 14px; color: #666; padding-left: 15px; }
+
+    .id-module {
+      background: #000;
+      border: 1px solid var(--panel-border);
+      padding: 10px;
+      display: flex;
+      gap: 15px;
+      box-shadow: inset 0 0 10px #000;
+    }
+
+    .digital-readout { display: flex; flex-direction: column; }
+    .digital-label { font-size: 10px; color: var(--hazard-yellow); }
+    .digital-input {
+      background: transparent;
+      border: none;
+      color: var(--terminal-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 20px;
+      width: 100px;
+      text-align: right;
+      border-bottom: 1px solid #333;
+    }
+
+    .main-grid { display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+
+    .status-panel {
+      border: 1px solid #333;
+      background: #0a0a0a;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .bio-scan-img {
+      height: 160px;
+      border: 1px dashed #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-family: 'Share Tech Mono', monospace;
+      margin-bottom: 10px;
+    }
+
+    .data-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #444;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      background: linear-gradient(90deg, var(--panel-border), transparent);
+      padding: 5px 10px;
+      font-size: 14px;
+      color: var(--text-bright);
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: inline-block;
+      border-left: 3px solid var(--accent-amber);
+    }
+
+    .form-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
+    .input-group { display: flex; flex-direction: column; flex-grow: 1; min-width: 100px; }
+    .input-group label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; }
+    .input-group input {
+      background: var(--input-bg);
+      border: 1px solid #333;
+      color: var(--accent-amber);
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+
+    .hazard-bar {
+      height: 10px;
+      width: 100%;
+      background: repeating-linear-gradient(45deg, #111, #111 10px, #d4a017 10px, #d4a017 20px);
+      margin: 20px 0;
+      opacity: 0.7;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      justify-content: flex-end;
+      padding-top: 20px;
+      border-top: 1px dashed #444;
+      flex-wrap: wrap;
+    }
+
+    .mech-btn {
+      background: var(--panel-bg);
+      color: var(--text-main);
+      border: 1px solid var(--accent-amber);
+      padding: 10px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      .header-section { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .search-module { flex-direction: column; align-items: stretch; }
+      .db-status { margin-left: 0; border-left: none; border-top: 1px solid #333; padding-left: 0; padding-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mech-container">
+    <div class="bolt tl"></div><div class="bolt tr"></div><div class="bolt bl"></div><div class="bolt br"></div>
+
+    <div class="search-module">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="ENTER SUBJECT ID / HN / NAME (TH/EN)" />
+      </div>
+      <button class="search-btn">SEARCH DB</button>
+      <div class="db-status">
+        <span class="active">MASTER FILE: LINKED</span>
+        <span class="active">AI CORE: ONLINE</span>
+      </div>
+    </div>
+
+    <div class="header-section">
+      <div class="system-title">
+        <h2>MEDICAL_LOG_SYSTEM</h2>
+        <h3>หน่วยบริการ: รพ.สต.บ้านบึง // SECTOR 7</h3>
+      </div>
+      <div class="id-module">
+        <div class="digital-readout"><span class="digital-label">SUBJECT_ID</span><input class="digital-input" value="123456" readonly /></div>
+        <div class="digital-readout"><span class="digital-label">HOSP_NO (HN)</span><input class="digital-input" value="HN7890" readonly /></div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="sidebar">
+        <div class="status-panel">
+          <div class="bio-scan-img">NO SIGNAL<br />CAMERA OFF</div>
+          <div style="font-size: 10px; color: var(--terminal-green);">SYSTEM ONLINE</div>
+          <div style="font-size: 10px; color: #555; margin-top: 5px;">V.2.0.44-BETA</div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="data-panel">
+          <div class="panel-header">SUBJECT INFORMATION</div>
+          <div class="form-row">
+            <div class="input-group" style="flex: 2;"><label>ชื่อ-สกุล (FULL NAME)</label><input type="text" value="ด.ช. สมชาย ใจดี" /></div>
+            <div class="input-group" style="flex: 0.5;"><label>ชื่อเล่น (AKA)</label><input type="text" value="ชาย" /></div>
+            <div class="input-group" style="flex: 1;"><label>เลขบัตรประชาชน (CITIZEN ID)</label><input type="text" value="1234567890123" /></div>
+          </div>
+          <div class="form-row">
+            <div class="input-group"><label>ว/ด/ป เกิด (DOB)</label><input type="text" value="01/01/2566" /></div>
+            <div class="input-group"><label>เวลาคลอด (TIME)</label><input type="text" value="08:30" /></div>
+            <div class="input-group" style="flex: 2;"><label>สถานที่คลอด (LOCATION)</label><input type="text" value="รพ.บ้านบึง" /></div>
+          </div>
+        </div>
+
+        <div class="data-panel">
+          <div class="panel-header">DELIVERY PROTOCOLS</div>
+          <div class="form-row">
+            <div class="input-group"><label>วิธีการคลอด</label><input type="text" value="คลอดธรรมชาติ" /></div>
+            <div class="input-group"><label>ผู้ทำคลอด</label><input type="text" value="พญ.สมศรี" /></div>
+            <div class="input-group"><label>อายุครรภ์</label><input type="text" value="39 สัปดาห์" /></div>
+            <div class="input-group"><label>ครรภ์ที่</label><input type="text" value="1" /></div>
+            <div class="input-group"><label>Apgar</label><input type="text" value="9/10" /></div>
+          </div>
+        </div>
+
+        <div class="hazard-bar"></div>
+
+        <div class="action-bar">
+          <button class="mech-btn">Edit</button>
+          <button class="mech-btn">Export</button>
+          <button class="mech-btn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
